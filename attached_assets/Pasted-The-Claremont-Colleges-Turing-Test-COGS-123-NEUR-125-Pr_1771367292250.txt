@@ -1,0 +1,38 @@
+The Claremont Colleges’ Turing Test
+COGS 123/NEUR 125 — Profs. Agarwal, Bang, & Keeley
+
+You’ve read about the Turing Test, as well as the “imitation game” parlor game on which Turing
+based his test. To give you a chance to think through the concepts and constraints of the Turing
+Test, we are going to conduct our own Claremont Colleges’ version of the test. Let’s see how
+good you are at differentiating Claremont imposters from Claremont truth tellers!
+The class will be divided into groups of three students. In each group, there will be an
+Interrogator (IN), a Poser (PS) and a True Collegian (TC). The task of IN will be to figure out
+which of the other two participants is telling the truth about which College they attend, and
+which one is lying. The job of PS is to convince IN they’re from a Claremont College that they
+do not attend. The job of TC will be to convince IN that they really ARE from the College they
+attend. Everyone will be anonymous. (And please don’t “cheat;” don’t do anything that would
+reveal your personal identity during the game. That would take the fun out of it.)
+Important: No using search engines or any resources on the Internet! Make
+use only of your own pre-existing knowledge about the Claremont Colleges.
+We will be using the chat feature in Zoom breakout rooms for all interactions. So, for example,
+perhaps IN is from Pitzer, PS is from Scripps and TC is from Pomona. IN will try to figure out
+which of the other two random interlocutors REALLY is from Pomona (as both TC and PS try to
+convince IN that they are the REAL Pomona student).
+All of this will be done entirely by typing. No turning on cameras or microphones.
+The test will occur in our class Zoom room. We will be admitting students one at a time (to
+rename them) and then putting them back in the waiting room. Once everybody has been given
+
+an anonymous name, everybody will be readmitted to the room and then disbursed into the three-
+person breakout rooms.
+
+Rules:
+1. When the session begins, everyone should jot down the (fake) names of yourself and the
+other two people and note who is the IN and what College the TC and PS are trying to
+represent. This information will be in the name of the Room.
+2. Remain anonymous, don’t reveal your personal identity (this goes for all players).
+3. PS and TC should direct their questions and answers only to IN. PS and TC will be able
+to read one another’s responses and can refer to those responses—but let IN direct the
+conversation. No back and forth arguments between PS and TC!
+4. Interrogation sessions will be from 10-15 minutes each.
+5. After the time limit is up, the chat session will end and the IN should make a note to
+themselves who they think the TC is.

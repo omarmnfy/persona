@@ -1,0 +1,54 @@
+modules = ["nodejs-20", "web", "postgresql-16", "python-3.11", "javascript"]
+[agent]
+expertMode = true
+integrations = ["github:1.0.0"]
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+APP_BASE_URL = "https://persona-omarmnfy.replit.app"
+SEED_ADMIN_EMAIL = "admin@classroom.local"
+SEED_ADMIN_PASSWORD = "O_njom#161803"
+PORT = "5000"
+SMTP_FROM = "Persona <personauserinvitation@gmail.com>"
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "465"
+INVITE_BANNER_PATH = "assets/email/harvey-mudd-banner.png"
+SMTP_USER = "personauserinvitation@gmail.com"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && npm run dev"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["npm", "run", "start"]
+build = ["npm", "run", "deploy:build"]
+publicDir = "public"

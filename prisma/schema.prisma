@@ -1,0 +1,241 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  STUDENT
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum RoundStatus {
+  SCHEDULED
+  ACTIVE
+  ENDED
+}
+
+enum RoomStatus {
+  NOT_STARTED
+  ACTIVE
+  ENDED
+}
+
+enum Role {
+  REAL
+  FAKE
+  INTERROGATOR
+  WAITING
+}
+
+enum MessageType {
+  USER
+  SYSTEM
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  accountType  AccountType
+  realName     String
+  firstName    String?
+  lastName     String?
+  school       String?
+  assignedName String?     @unique
+  nickname     String?
+  fixedRole    Role?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  lastSeenAt   DateTime?
+  isActive     Boolean     @default(false)
+
+  sessions         Session[]
+  invites          InviteToken[]
+  passwordResets   PasswordResetToken[]
+  memberships      RoomMembership[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  createdRounds    Round[]              @relation("AdminRounds")
+  createdSessions  DiscussionSession[]  @relation("AdminSessions")
+  auditLogs        AuditLog[]
+  interrogatorGuesses InterrogatorGuess[] @relation("InterrogatorGuesses")
+  guessedAsReal       InterrogatorGuess[] @relation("GuessedAsReal")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  csrfToken String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ClassConfig {
+  id                   String   @id @default(uuid())
+  joinCodeHash         String?
+  joinCodeCreatedAt    DateTime?
+  allowAdminPosting    Boolean  @default(false)
+  showAdminJoinMessage Boolean  @default(true)
+  silentViewReadOnly   Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model InviteToken {
+  id        String   @id @default(uuid())
+  tokenHash String
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DiscussionSession {
+  id               String   @id @default(uuid())
+  sessionNumber    Int
+  name             String
+  createdByAdminId String
+  createdAt        DateTime @default(now())
+
+  createdByAdmin User    @relation("AdminSessions", fields: [createdByAdminId], references: [id])
+  rounds         Round[]
+
+  @@unique([sessionNumber])
+}
+
+model Round {
+  id                String      @id @default(uuid())
+  roundNumber       Int
+  topic             String
+  status            RoundStatus
+  seed              String?
+  durationSeconds   Int
+  autoReshuffle     Boolean     @default(false)
+  assignmentsLocked Boolean     @default(false)
+  expectedStudents  Int?
+  joinCodeHash      String?
+  joinCodePlain     String?
+  joinCodeCreatedAt DateTime?
+  startsAt          DateTime?
+  endsAt            DateTime?
+  createdByAdminId  String
+  sessionId         String?
+  createdAt         DateTime    @default(now())
+
+  createdByAdmin User              @relation("AdminRounds", fields: [createdByAdminId], references: [id])
+  session        DiscussionSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  rooms          Room[]
+  memberships    RoomMembership[]
+  messages       Message[]
+  guesses        InterrogatorGuess[]
+
+  @@unique([roundNumber])
+  @@index([sessionId])
+}
+
+model Room {
+  id         String     @id @default(uuid())
+  roundId    String
+  roomNumber Int
+  name       String?
+  status     RoomStatus
+  createdAt  DateTime   @default(now())
+
+  round       Round @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  memberships RoomMembership[]
+  messages    Message[]
+  guesses     InterrogatorGuess[]
+
+  @@unique([roundId, roomNumber])
+}
+
+model RoomMembership {
+  id           String   @id @default(uuid())
+  roundId      String
+  roomId       String?
+  userId       String
+  assignedRole Role
+  nicknameUsed String
+  createdAt    DateTime @default(now())
+  joinedAt     DateTime?
+  leftAt       DateTime?
+
+  round Round @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  room  Room? @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roundId, userId])
+  @@index([roomId])
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  roundId        String
+  roomId         String
+  questionId     String?
+  isQuestion     Boolean     @default(false)
+  revealAt       DateTime?
+  questionEndsAt DateTime?
+  senderId       String?
+  recipientId    String?
+  body           String
+  type           MessageType
+  createdAt      DateTime    @default(now())
+
+  round     Round @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  room      Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender    User? @relation("SentMessages", fields: [senderId], references: [id])
+  recipient User? @relation("ReceivedMessages", fields: [recipientId], references: [id])
+
+  @@index([roomId])
+  @@index([roomId, questionId])
+  @@index([revealAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model InterrogatorGuess {
+  id            String   @id @default(uuid())
+  roundId       String
+  roomId        String
+  interrogatorId String
+  guessedUserId String
+  correct       Boolean
+  createdAt     DateTime @default(now())
+
+  round       Round @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  room        Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  interrogator User @relation("InterrogatorGuesses", fields: [interrogatorId], references: [id])
+  guessedUser  User @relation("GuessedAsReal", fields: [guessedUserId], references: [id])
+
+  @@unique([roundId, roomId, interrogatorId])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String
+  payloadJSON Json
+  createdAt  DateTime @default(now())
+
+  admin User @relation(fields: [adminId], references: [id])
+}
